@@ -1,4 +1,4 @@
-
+package es.unican.is2.seguros;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
