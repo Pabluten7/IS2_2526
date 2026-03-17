@@ -1,4 +1,4 @@
-package es.unican.is2.seguros;
+//package es.unican.is2.seguros;
 
 public class Runner {
 
