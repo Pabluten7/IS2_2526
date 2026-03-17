@@ -8,6 +8,7 @@ import javax.swing.JTextField;
 import javax.swing.JLabel;
 
 import java.awt.event.ActionListener;
+import java.util.List;
 import java.awt.event.ActionEvent;
 
 import javax.swing.JList;
@@ -27,7 +28,10 @@ public class VistaAgente extends JFrame {
 	private DefaultListModel<String> listModel;
 	private JButton btnBuscar;
 	
-	private IGestionClientes clientes;
+	//private IGestionClientes clientes;
+	//private IGestionSeguros seguros;
+
+	private transient IGestionClientes clientes;
 	private IGestionSeguros seguros;
 	private IInfoSeguros info;
 
@@ -44,7 +48,8 @@ public class VistaAgente extends JFrame {
 	}
 	
 	public void init() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 341);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
