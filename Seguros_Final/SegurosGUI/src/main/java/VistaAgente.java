@@ -30,10 +30,12 @@ public class VistaAgente extends JFrame {
 	
 	//private IGestionClientes clientes;
 	//private IGestionSeguros seguros;
-
+	//private IInfoSeguros info;
+	
 	private transient IGestionClientes clientes;
-	private IGestionSeguros seguros;
-	private IInfoSeguros info;
+	private transient IGestionSeguros seguros;
+	private transient IInfoSeguros info;
+	
 
 	/**
 	 * Create the frame.
