@@ -45,5 +45,20 @@ public class SeguroTest {
         seguro.setCobertura(Cobertura.TERCEROS);
         seguro.setPotencia(111);
         assertEquals(480.0, seguro.precio());
+
+        // S6: Límite AVL Fecha - Exactamente 1 año atrás (Justo en el límite del descuento)
+        // Al ser isBefore, si tiene 1 año justo, ya NO es "antes de", por lo que NO hay descuento.
+        // Precio: Todo Riesgo (1000) * Potencia 80 (x1.0) = 1000.0
+        seguro.setFechaInicio(LocalDate.now().minusYears(1));
+        seguro.setCobertura(Cobertura.TODO_RIESGO);
+        seguro.setPotencia(80);
+        assertEquals(1000.0, seguro.precio(), "Fallo en límite exacto de 1 año");
+
+        // S7: Límite AVL Fecha - 1 año menos un día (Aún debe tener el 20% de descuento)
+        // Precio: Todo Riesgo (1000) * Potencia 80 (x1.0) * 0.80 = 800.0
+        seguro.setFechaInicio(LocalDate.now().minusYears(1).plusDays(1));
+        seguro.setCobertura(Cobertura.TODO_RIESGO);
+        seguro.setPotencia(80);
+        assertEquals(800.0, seguro.precio(), "Fallo en límite de 1 año menos un día");
     }
 }
