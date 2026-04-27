@@ -1,5 +1,5 @@
-//package es.unican.is2.seguros;
 
+import es.unican.is2.seguros.*;
 import java.util.List;
 
 /**

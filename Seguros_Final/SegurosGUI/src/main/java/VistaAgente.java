@@ -1,4 +1,5 @@
-//package es.unican.is2.seguros;
+
+import es.unican.is2.seguros.*;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;

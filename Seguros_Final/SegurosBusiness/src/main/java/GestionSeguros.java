@@ -1,4 +1,4 @@
-//package es.unican.is2.seguros;
+import es.unican.is2.seguros.*;
 
 public class GestionSeguros implements IGestionSeguros, IGestionClientes, IInfoSeguros {
 
