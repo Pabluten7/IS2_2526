@@ -7,6 +7,7 @@
         <version>0.0.1</version>
     </parent>
     <artifactId>SegurosGUI</artifactId>
+    
     <dependencies>
         <dependency>
             <groupId>es.unican.is2</groupId>
@@ -17,6 +18,18 @@
             <groupId>es.unican.is2</groupId>
             <artifactId>SegurosBusiness</artifactId>
             <version>0.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>es.unican.is2</groupId>
+            <artifactId>SegurosDAOH2</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-swing-junit</artifactId>
+            <version>3.17.1</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
