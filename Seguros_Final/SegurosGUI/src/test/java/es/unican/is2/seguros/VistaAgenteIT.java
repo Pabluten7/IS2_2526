@@ -52,7 +52,8 @@ public class VistaAgenteIT {
 
     @Test
     void testConsultaClienteJuan() {
-        window.textBox("txtDNICliente").enterText("11111111A");
+        // Usamos setText para inyectar el String de golpe y evitar que el teclado falle
+        window.textBox("txtDNICliente").setText("11111111A");
         window.button("btnBuscar").click();
 
         window.textBox("txtNombreCliente").requireText("Juan");
@@ -61,7 +62,7 @@ public class VistaAgenteIT {
 
     @Test
     void testConsultaClienteLuis() {
-        window.textBox("txtDNICliente").enterText("33333333A");
+        window.textBox("txtDNICliente").setText("33333333A");
         window.button("btnBuscar").click();
 
         window.textBox("txtNombreCliente").requireText("Luis");

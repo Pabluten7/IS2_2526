@@ -112,6 +112,7 @@ public class VistaAgente extends JFrame {
             }
         } catch (DataAccessException e) {
             // Manejo de error si falla la base de datos
+            e.printStackTrace();
         }
     }
 }
