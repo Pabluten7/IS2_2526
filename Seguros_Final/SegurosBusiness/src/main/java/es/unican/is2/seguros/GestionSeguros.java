@@ -1,7 +1,5 @@
-package es.unican.is.seguros;
-import es.unican.is.seguros.IClientesDAO;
-import es.unican.is.seguros.ISegurosDAO;
-import es.unican.is2.seguros.*;
+package es.unican.is2.seguros;
+
 
 public class GestionSeguros implements IGestionSeguros, IGestionClientes, IInfoSeguros {
 

@@ -4,8 +4,8 @@ import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.junit.jupiter.api.Test;
 
-import es.seguros.GestionSeguros;
 import es.unican.is.seguros.ClientesDAO;
+import es.unican.is.seguros.GestionSeguros;
 import es.unican.is.seguros.SegurosDAO;
 
 public class VistaAgenteIT extends AssertJSwingJUnitTestCase {
@@ -18,13 +18,12 @@ public class VistaAgenteIT extends AssertJSwingJUnitTestCase {
         ClientesDAO clientesDAO = new ClientesDAO();
         SegurosDAO segurosDAO = new SegurosDAO();
 
-        // 2. Instanciamos tu GestionSeguros (que sí existe)
-        GestionSeguros gSeguros = new GestionSeguros(segurosDAO, clientesDAO);
+        // 2. Instanciamos tu GestionSeguros con el orden correcto (primero Clientes, luego Seguros)
+        GestionSeguros gSeguros = new GestionSeguros(clientesDAO, segurosDAO);
 
-        // 3. Lanzamos la vista. 
-        // Pasamos clientesDAO (donde pida gestión de clientes) 
-        // y gSeguros (donde pida gestión de seguros).
-        VistaAgente frame = new VistaAgente(clientesDAO, gSeguros, clientesDAO);
+        // 3. Lanzamos la vista pasando gSeguros a los 3 parámetros, 
+        // ya que implementa las interfaces IGestionClientes, IGestionSeguros e IInfoSeguros.
+        VistaAgente frame = new VistaAgente(gSeguros, gSeguros, gSeguros);
         
         window = new FrameFixture(robot(), frame);
         window.show(); 
@@ -37,11 +36,13 @@ public class VistaAgenteIT extends AssertJSwingJUnitTestCase {
         window.button("btnBuscar").click();
 
         window.textBox("txtNombreCliente").requireText("Juan");
-        window.textBox("txtTotalCliente").requireText("1784.0");
+        // El total real es: 400 (1111AAA) + 1000 (1111BBB) + 420 (1111CCC) = 1820.0
+        window.textBox("txtTotalCliente").requireText("1820.0");
     }
 
     @Test
     void testConsultaClienteLuis() {
+        // Luis tiene minusvalía pero 0 seguros en la base de datos inicial
         window.textBox("txtDNICliente").enterText("33333333A");
         window.button("btnBuscar").click();
 
