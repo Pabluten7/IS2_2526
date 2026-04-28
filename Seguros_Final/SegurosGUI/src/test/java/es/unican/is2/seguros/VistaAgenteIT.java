@@ -72,4 +72,22 @@ public class VistaAgenteIT {
         window.textBox("txtNombreCliente").requireText("Luis");
         window.textBox("txtTotalCliente").requireText("0.0");
     }
+    @Test
+    void testConsultaClienteNoExiste() {
+        // 1. Buscamos primero a Juan para que haya datos en la pantalla
+        window.textBox("txtDNICliente").setText("11111111A");
+        window.button("btnBuscar").click();
+        
+        // 2. Ahora buscamos un DNI que sabemos que NO está en H2ServerConnectionManager
+        window.textBox("txtDNICliente").setText("99999999Z");
+        window.button("btnBuscar").click();
+
+        // 3. Verificamos que los campos se han limpiado (según tu lógica en rellenaDatosCliente)
+        window.textBox("txtNombreCliente").requireText("");
+        window.textBox("txtTotalCliente").requireText("");
+        
+        // Verificamos que la lista de seguros está vacía
+        String[] items = window.list("listSeguros").contents();
+        assert(items.length == 0);
+    }
 }
