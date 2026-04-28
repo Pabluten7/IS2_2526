@@ -12,6 +12,7 @@
         <maven.compiler.source>21</maven.compiler.source>
         <sonar.host.url>http://localhost:9000</sonar.host.url>
         <sonar.token>squ_fb06fed694f4e17c503ba7ae596a61faf7b2558a</sonar.token> 
+        <argLine></argLine>
     </properties>
 
     <modules>
@@ -51,10 +52,19 @@
                 <version>3.2.1</version>
             </plugin>
 
-            <plugin>
+           <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>3.2.1</version>
+                <configuration>
+                    <argLine>
+                        @{argLine}
+                        --add-opens java.base/java.util=ALL-UNNAMED
+                        --add-opens java.desktop/java.awt=ALL-UNNAMED
+                        --add-opens java.desktop/javax.swing=ALL-UNNAMED
+                        --add-opens java.desktop/javax.swing.text=ALL-UNNAMED
+                    </argLine>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -68,7 +78,12 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.11</version>
+                <version>0.8.12</version>
+                <configuration>
+                    <includes>
+                        <include>es/unican/is2/**</include>
+                    </includes>
+                </configuration>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
