@@ -1,3 +1,4 @@
+package es.seguros;
 
 import es.unican.is2.seguros.*;
 
