@@ -10,13 +10,13 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.awt.Dimension;
 
 public class VistaAgenteIT {
 
     private FrameFixture window;
     private Robot robot;
 
-    // Configuración obligatoria para JUnit 5 + AssertJ Swing
     @BeforeAll
     public static void setUpOnce() {
         FailOnThreadViolationRepaintManager.install();
@@ -24,23 +24,26 @@ public class VistaAgenteIT {
 
     @BeforeEach
     public void setUp() {
+        // Inicializamos la lógica real
         ClientesDAO clientesDAO = new ClientesDAO();
         SegurosDAO segurosDAO = new SegurosDAO();
         GestionSeguros gSeguros = new GestionSeguros(clientesDAO, segurosDAO);
 
-        // Forzamos un robot completamente nuevo y aislado para que no haya ventanas fantasma
         robot = BasicRobot.robotWithNewAwtHierarchy();
 
         VistaAgente frame = GuiActionRunner.execute(new GuiQuery<VistaAgente>() {
             @Override
             protected VistaAgente executeInEDT() {
-                return new VistaAgente(gSeguros, gSeguros, gSeguros);
+                VistaAgente v = new VistaAgente(gSeguros, gSeguros, gSeguros);
+                v.setPreferredSize(new Dimension(450, 300)); // Forzamos tamaño
+                v.pack();
+                return v;
             }
         });
         
-        // Unimos el nuevo robot a nuestra ventana
         window = new FrameFixture(robot, frame);
         window.show(); 
+        window.focus(); // Requerido para que el teclado funcione
     }
 
     @AfterEach
@@ -52,10 +55,11 @@ public class VistaAgenteIT {
 
     @Test
     void testConsultaClienteJuan() {
-        // Usamos setText para inyectar el String de golpe y evitar que el teclado falle
+        // Reemplazamos enterText por setText para evitar fallos de velocidad de teclado
         window.textBox("txtDNICliente").setText("11111111A");
         window.button("btnBuscar").click();
 
+        // Esperamos un momento a que la BD responda y la UI se actualice
         window.textBox("txtNombreCliente").requireText("Juan");
         window.textBox("txtTotalCliente").requireText("1820.0");
     }
