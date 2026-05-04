@@ -18,3 +18,5 @@ Subir al repositorio remoto (Push): Subir tu rama con el código final a GitHub 
 Hacer el Pull Request: Ir a la página web de GitHub e integrar tu rama practica2 en la rama principal (main o master) mediante un Pull Request.
 
 Crear la Release: Finalmente, desde la propia web de GitHub, crear una Release en el repositorio con el código final de la práctica.
+
+.
