@@ -1,3 +1,4 @@
+
 import java.util.LinkedList;
 import java.util.List;
 import fundamentos.*;
@@ -21,7 +22,7 @@ public class GestionTransportesGUI {
 		Conductor c;
 
 		// crea la empresa de transportes
-		gestionTransportes gt = new gestionTransportes();
+		GestionTransportes gt = new GestionTransportes();
 		// crea la ventana de menu
 		Menu menu = new Menu("Transportes");
 		menu.insertaOpcion("Anhade conductor", ANHADE_CONDUCTOR);
@@ -130,7 +131,7 @@ public class GestionTransportesGUI {
 		}
 	}
 
-	/**
+	/**	
 	 * Metodo auxiliar que muestra un ventana de mensaje
 	 * @param titulo titulo de la ventana
 	 * @param txt texto contenido en la ventana
