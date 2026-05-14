@@ -15,6 +15,13 @@
 
     <dependencies>
         <dependency>
+            <groupId>fundamentos</groupId>
+            <artifactId>fundamentos</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/fundamentos.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>5.10.0</version>

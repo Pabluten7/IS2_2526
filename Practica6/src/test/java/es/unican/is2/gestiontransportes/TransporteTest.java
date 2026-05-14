@@ -1,3 +1,4 @@
+package es.unican.is2.gestiontransportes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
