@@ -5,6 +5,21 @@ import java.util.ArrayList;
  * Clase que representa a un conductor, con sus datos personales
  * y los transportes que ha realizado. 
  */
+
+/**
+ * MÉTRICAS INICIALES - CLASE CONDUCTOR
+ * WMC = 18
+ * - Métodos simples: 1 + 6 getters = 7
+ * - Contructor: 5 (1 base + 4 condiciones)
+ * - Método sueldo(): 6 (1 base + 1 por for + 1 por switch + 1 por if)
+ * CCog = 9
+ * - Constructor: 4 (1 base + 4 condiciones)
+ * - Método sueldo(): 7 (1 for + 2 witch anidado + 3 por if anidado + 1 else)
+ * CBO = 1
+ * DIT = 0
+ * NOC = 0
+ */
+
 public class Conductor {
 
 	private ArrayList<Transporte> transportes = new ArrayList<Transporte>();
@@ -65,7 +80,7 @@ public class Conductor {
 					if (t.getPersonas() < 10)
 						sueldoExtraTransporte = t.horas() * 0.5;
 					else
-						sueldoExtraTransporte = t.horas();
+							sueldoExtraTransporte = t.horas();
 					break;
 			}
 			sueldoTransportes += t.horas() * 5 + sueldoExtraTransporte;
