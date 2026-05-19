@@ -106,12 +106,13 @@ public class Conductor {
     // -----------------------------------------------------------------------
     // Alias de compatibilidad
     // -----------------------------------------------------------------------
-
+    @Deprecated
     /** @deprecated usar {@link #getDni()} */
     public String dni() {
         return getDni();
     }
 
+    @Deprecated
     /** @deprecated usar {@link #getApellido2()} */
     public String apellido2() {
         return getApellido2();

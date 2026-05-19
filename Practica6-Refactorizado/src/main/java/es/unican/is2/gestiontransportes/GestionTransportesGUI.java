@@ -152,9 +152,9 @@ public class GestionTransportesGUI {
 
     private static Transporte parseTipoTransporte(String tipo, int horas, int personas, int toneladas) {
         return switch (tipo) {
-            case "P"  -> new Transporte(horas, CategoriaTransporte.Personas,             personas);
-            case "M"  -> new Transporte(horas, CategoriaTransporte.Mercancias,           toneladas);
-            case "MP" -> new Transporte(horas, CategoriaTransporte.MercanciasPeligrosas, toneladas);
+            case "P"  -> new TransportePersonas(horas, personas);
+            case "M"  -> new TransporteMercancias(horas, toneladas);
+            case "MP" -> new TransporteMercanciasPeligrosas(horas, toneladas);
             default   -> null;
         };
     }
