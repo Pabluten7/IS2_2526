@@ -10,51 +10,40 @@ import java.util.List;
  *
  * REFACTORIZACIONES APLICADAS:
  *
- * 1. "Replace Conditional with Polymorphism" (Fowler) en sueldo():
- *    El switch original sobre t.categoria() se elimina por completo.
- *    La lógica de cálculo del sueldo extra pasa a residir en CategoriaTransporte
- *    (cada constante del enum implementa calcularSueldoExtra).
- *    El método sueldo() queda reducido a un simple bucle sin ramificaciones,
- *    bajando su CCog de 4 a 1.
+ * 1. "Replace Type Code with Subclasses" (Fowler):
+ * Se ha eliminado el enumerado CategoriaTransporte. Ahora la lógica 
+ * reside en la jerarquía polimórfica de Transporte.
  *
- * 2. "Extract Method" (Fowler) - calcularSueldoTransporte():
- *    La lógica de cálculo del sueldo de un transporte individual se extrae
- *    a un método privado auxiliar, mejorando la legibilidad de sueldo().
+ * 2. "Replace Conditional with Polymorphism" (Fowler) en sueldo():
+ * El switch original sobre t.categoria() se elimina por completo.
+ * El método sueldo() queda reducido a un simple bucle sin ramificaciones.
  *
- * 3. "Rename Method" (Fowler):
- *    Se unifica la API eliminando la duplicidad dni()/getDni() y apellido2()/getApellido2().
- *    Se mantienen los alias por retrocompatibilidad tal como en Transporte.
+ * 3. "Extract Method" (Fowler) - calcularSueldoTransporte():
+ * La lógica de cálculo del sueldo de un transporte individual se extrae
+ * a un método privado auxiliar.
  *
- * 4. "Encapsulate Collection" (Fowler):
- *    getTransportes() devuelve una vista no modificable de la lista interna,
- *    evitando que código externo modifique la colección directamente.
+ * 4. "Rename Method" (Fowler):
+ * Se unifica la API eliminando la duplicidad dni()/getDni() y apellido2()/getApellido2().
  *
- * 5. "Introduce Constant" - SUELDO_BASE:
- *    El literal 700 se nombra como constante SUELDO_BASE mejorando la legibilidad.
+ * 5. "Encapsulate Collection" (Fowler):
+ * getTransportes() devuelve una vista no modificable de la lista interna.
  *
- * 6. "Add final to fields" (mejora de robustez):
- *    Los campos que no cambian tras la construcción se declaran final.
+ * 6. "Introduce Constant" y "Add final to fields":
+ * Se utilizan constantes para los literales y final para los atributos inmutables.
  *
  * MÉTRICAS - CLASE Conductor (refactorizado)
- * WMC  = 13
- *   - Constructor:              3 (base + 4 condiciones OR reducidas a 1 if compuesto)
- *   - sueldo():                 2 (base + 1 for)
- *   - calcularSueldoTransporte: 1 (base, sin ramas)
- *   - getTransportes():         1
- *   - anhadeTransporte():       1
- *   - getDni()/dni():           1+1 = 2
- *   - getNombre():              1
- *   - getApellido1():           1
- *   - getApellido2()/apellido2():1+1=2  → pero apellido2() delega → cuenta 1
- *   - getDire():                1
- *   Total ≈ 13
- * WMCn = 4  (constructor, sueldo, calcularSueldoTransporte, anhadeTransporte)
- * CCog  = 5
- *   - Constructor: 4 (condiciones del if compuesto con ||)
- *   - sueldo():    1 (for)
- *   - calcularSueldoTransporte: 0
- * CCogn = 5
- * CBO   = 2  -> Transporte, CategoriaTransporte
+ * WMC  = 17
+ * - Constructor:              5 (1 base + 1 por if + 3 por operadores ||)
+ * - sueldo():                 2 (1 base + 1 por for)
+ * - calcularSueldoTransporte: 1 (base, sin ramas)
+ * - Métodos simples (getters, alias, add): 9 (1 cada uno)
+ * WMCn = 1.41 (17 / 12 métodos)
+ * CCog  = 3
+ * - Constructor: 2 (1 por if + 1 por la secuencia de operadores ||)
+ * - sueldo():    1 (1 por for)
+ * - calcularSueldoTransporte: 0
+ * CCogn = 3
+ * CBO   = 1  -> Transporte (Colecciones de Java no suman y CategoriaTransporte se eliminó)
  * DIT   = 0
  * NOC   = 0
  */
@@ -149,15 +138,13 @@ public class Conductor {
      * Calcula el sueldo correspondiente a un único transporte.
      * (Extract Method)
      *
-     * @param t el transporte
+     * @param t el transporte (ahora es polimórfico)
      * @return importe del sueldo generado por ese transporte
      */
     private double calcularSueldoTransporte(Transporte t) {
-        int valorCategoria = (t.getCategoria() == CategoriaTransporte.Personas)
-                ? t.getPersonas()
-                : t.getTon();
-        double sueldoExtra = t.getCategoria().calcularSueldoExtra((int) t.getHoras(), valorCategoria);
-        return t.getHoras() * TARIFA_HORA + sueldoExtra;
+        // Polimorfismo puro. El CBO y la complejidad bajan drásticamente 
+        // al no requerir comprobaciones de tipos ni conversiones de variables.
+        return (t.getHoras() * TARIFA_HORA) + t.calcularSueldoExtra();
     }
 
     public void anhadeTransporte(Transporte t) {
