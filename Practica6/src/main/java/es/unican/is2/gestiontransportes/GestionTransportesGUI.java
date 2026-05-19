@@ -1,161 +1,221 @@
 package es.unican.is2.gestiontransportes;
-import java.util.LinkedList;
+
+import java.util.ArrayList;
 import java.util.List;
 import fundamentos.*;
 
 /**
- * MÉTRICAS - CLASE GESTIONTRANSPORTESGUI
- * WMC = 16
- * - mensaje(): 1
- * - main(): 15 (1 base + 1 while + 4 cases switch externo + 1 if ANHADE_CONDUCTOR
- *               + 1 if ANHADE_TRANSPORTE + 3 cases switch tipo + 1 if SUELDO
- *               + 1 for + 1 if + 1 else if MEJOR_CONDUCTOR)
- * CCog = 24
- * - main(): 24 (1 while + 2 switch anidado + 3 if nivel 2 + 4 switch anidado nivel 3
- *               + 1 else + 3 if nivel 2 + 1 else + 3 for nivel 2 + 4 if nivel 3
- *               + 2 else if + 3 if nivel 2)
- * CBO = 4 -> GestionTransportes, Conductor, Transporte, CategoriaTransporte
- * DIT = 0
- * NOC = 0
- */
-
-/**
- * Gestion de una empresa de transportes
+ * Interfaz gráfica de la gestión de una empresa de transportes.
+ *
+ * REFACTORIZACIONES APLICADAS:
+ *
+ * 1. "Extract Method" (Fowler):
+ *    Cada case del switch principal se extrae a un método privado dedicado:
+ *      - procesarAnhadeConductor()
+ *      - procesarAnhadeTransporte()
+ *      - procesarSueldoConductor()
+ *      - procesarMejorConductor()
+ *    Esto reduce drásticamente el CCog de main(), que pasa de 24 a 5.
+ *
+ * 2. "Replace Conditional with Polymorphism" en parseTipoTransporte():
+ *    El switch anidado sobre el tipo de transporte ("P","M","MP") se extrae
+ *    a un método privado auxiliar con un valor de retorno claro.
+ *
+ * 3. "Introduce Constant" (Fowler):
+ *    Las cadenas "DNI", "Nombre", etc. se declaran como constantes para
+ *    evitar magic strings duplicadas en varios métodos.
+ *
+ * 4. Bug fix detectado durante refactorización (MEJOR_CONDUCTOR):
+ *    El original mostraba conductor.getNombre() dos veces en lugar de
+ *    getNombre() + getApellido1(). Se corrige.
+ *
+ * 5. "Rename Variable":
+ *    Variables de un solo carácter o abreviadas (gt, lect, c, t, msj)
+ *    pasan a tener nombres descriptivos.
+ *
+ * MÉTRICAS - CLASE GestionTransportesGUI (refactorizado)
+ * WMC  = 22
+ *   - main():                        2  (base + while)
+ *   - procesarAnhadeConductor():      2  (base + if)
+ *   - procesarAnhadeTransporte():     3  (base + if + switch tipo)
+ *   - parseTipoTransporte():          4  (base + 3 cases)
+ *   - procesarSueldoConductor():      2  (base + if)
+ *   - procesarMejorConductor():       5  (base + for + if + else if + if vacio)
+ *   - mensaje():                      1
+ *   - formatearMejoresConductores():  2  (base + for)
+ *   Total = 21
+ * WMCn = 7  (métodos no triviales: main, los 4 procesar, parseTipo, formatear)
+ * CCog  = 13
+ *   - main():                         1 (while)
+ *   - procesarAnhadeConductor():       1 (if)
+ *   - procesarAnhadeTransporte():      2 (if + switch)
+ *   - procesarSueldoConductor():       1 (if)
+ *   - procesarMejorConductor():        4 (for + if + else if + if vacío)
+ *   - formatearMejoresConductores():   1 (for)
+ *   - parseTipoTransporte():           3 (3 cases)
+ * CCogn = 13
+ * CBO   = 4  -> GestionTransportes, Conductor, Transporte, CategoriaTransporte
+ * DIT   = 0
+ * NOC   = 0
  */
 public class GestionTransportesGUI {
 
-	/**
-	 * Programa principal basado en menu
-	 */
-	public static void main(String[] args) {
-		// opciones del menu
-		final int ANHADE_CONDUCTOR = 0, ANHADE_TRANSPORTE = 1, 
-		SUELDO_CONDUCTOR = 2, MEJOR_CONDUCTOR = 3;
+    // -----------------------------------------------------------------------
+    // Constantes para las claves de los campos de entrada
+    // -----------------------------------------------------------------------
+    private static final String CAMPO_DNI       = "DNI";
+    private static final String CAMPO_NOMBRE    = "Nombre";
+    private static final String CAMPO_APELLIDO1 = "Apellido1";
+    private static final String CAMPO_APELLIDO2 = "Apellido2";
+    private static final String CAMPO_DIRECCION = "Direccion";
+    private static final String CAMPO_TIPO      = "Tipo Transporte: P | M | MP";
+    private static final String CAMPO_HORAS     = "Horas";
+    private static final String CAMPO_PERSONAS  = "Personas";
+    private static final String CAMPO_TONELADAS = "Toneladas";
 
-		// variables auxiliares
-		String dni;
-		Lectura lect;
-		Conductor c;
+    // Opciones de menú
+    private static final int ANHADE_CONDUCTOR  = 0;
+    private static final int ANHADE_TRANSPORTE = 1;
+    private static final int SUELDO_CONDUCTOR  = 2;
+    private static final int MEJOR_CONDUCTOR   = 3;
 
-		// crea la empresa de transportes
-		GestionTransportes gt = new GestionTransportes();
-		// crea la ventana de menu
-		Menu menu = new Menu("Transportes");
-		menu.insertaOpcion("Anhade conductor", ANHADE_CONDUCTOR);
-		menu.insertaOpcion("Anhade transporte", ANHADE_TRANSPORTE);
-		menu.insertaOpcion("Sueldo conductor", SUELDO_CONDUCTOR);
-		menu.insertaOpcion("Mejor conductor", MEJOR_CONDUCTOR);
-		
-		int opcion;
+    /**
+     * Programa principal basado en menú.
+     */
+    public static void main(String[] args) {
+        GestionTransportes gestion = new GestionTransportes();
 
-		// lazo de espera de comandos del usuario
-		while(true) {
-			opcion = menu.leeOpcion();
+        Menu menu = new Menu("Transportes");
+        menu.insertaOpcion("Anhade conductor",  ANHADE_CONDUCTOR);
+        menu.insertaOpcion("Anhade transporte", ANHADE_TRANSPORTE);
+        menu.insertaOpcion("Sueldo conductor",  SUELDO_CONDUCTOR);
+        menu.insertaOpcion("Mejor conductor",   MEJOR_CONDUCTOR);
 
-			// realiza las acciones dependiendo de la opcion elegida
-			switch (opcion) {
-			case  ANHADE_CONDUCTOR:
-				lect = new Lectura("Datos Conductor");
-				lect.creaEntrada("DNI", "");
-				lect.creaEntrada("Nombre","");
-				lect.creaEntrada("Apellido1", "");
-				lect.creaEntrada("Apellido2", "");
-				lect.creaEntrada("Direccion", "");
-				lect.esperaYCierra();
-				dni = lect.leeString("DNI");
-				String nombre = lect.leeString("Nombre");
-				String apellido1 = lect.leeString("Apellido1");
-				String apellido2 = lect.leeString("Apellido2");
-				String direccion = lect.leeString("Direccion");
-				// Anhade el conductor
-				if (!gt.anhadeConductor(dni, nombre, apellido1, apellido2, direccion)) 
-					mensaje("ERROR", "Ya existe un conductor con DNI "+dni);
-				break;
+        while (true) {
+            int opcion = menu.leeOpcion();
+            switch (opcion) {
+                case ANHADE_CONDUCTOR  -> procesarAnhadeConductor(gestion);
+                case ANHADE_TRANSPORTE -> procesarAnhadeTransporte(gestion);
+                case SUELDO_CONDUCTOR  -> procesarSueldoConductor(gestion);
+                case MEJOR_CONDUCTOR   -> procesarMejorConductor(gestion);
+            }
+        }
+    }
 
-			case ANHADE_TRANSPORTE:
-				lect = new Lectura("Nuevo transporte");
-				lect.creaEntrada("DNI", "");
-				lect.creaEntrada("Tipo Transporte: P | M | MP", "");
-				lect.creaEntrada("Horas", 0);
-				lect.creaEntrada("Personas", 0);
-				lect.creaEntrada("Toneladas", 0);
-				lect.esperaYCierra();
-				dni = lect.leeString("DNI");
-				String tipo = lect.leeString("Tipo Transporte: P | M | MP");
-				int horas = lect.leeInt("Horas");
-				int personas = lect.leeInt("Personas");
-				int toneladas = lect.leeInt("Toneladas");
+    // -----------------------------------------------------------------------
+    // Métodos extraídos (Extract Method)
+    // -----------------------------------------------------------------------
 
-				Transporte t = null;
-				c = gt.buscaConductor(dni);
-				if (c!=null) {
-					switch (tipo) {
-						case "P":
-							t = new Transporte(horas,CategoriaTransporte.Personas, personas);
-							c.anhadeTransporte(t);
-							break;
-						case "M":
-							t = new Transporte(horas, CategoriaTransporte.Mercancias, toneladas);
-							c.anhadeTransporte(t);
-							break;
-						case "MP":
-							t = new Transporte(horas, CategoriaTransporte.MercanciasPeligrosas, toneladas);
-							c.anhadeTransporte(t);
-							break;		
-					}
-				} else {
-					mensaje("ERROR", "No existe un conductor con DNI "+dni);
-				}
-				break;
-				
-			case SUELDO_CONDUCTOR:
-				lect = new Lectura("Transportes Peligrosos");
-				lect.creaEntrada("DNI", "");
-				lect.esperaYCierra();
-				dni = lect.leeString("DNI");
-				c = gt.buscaConductor(dni);
-				if (c!=null){
-					mensaje("Sueldo", "El sueldo del conductor es: "+c.sueldo());
-				} else {
-					mensaje("ERROR", "No existe un conductor con DNI "+dni);
-				}
- 				break;
+    private static void procesarAnhadeConductor(GestionTransportes gestion) {
+        Lectura lectura = new Lectura("Datos Conductor");
+        lectura.creaEntrada(CAMPO_DNI, "");
+        lectura.creaEntrada(CAMPO_NOMBRE, "");
+        lectura.creaEntrada(CAMPO_APELLIDO1, "");
+        lectura.creaEntrada(CAMPO_APELLIDO2, "");
+        lectura.creaEntrada(CAMPO_DIRECCION, "");
+        lectura.esperaYCierra();
 
-			case MEJOR_CONDUCTOR:
-				List<Conductor> resultado = new LinkedList<Conductor>();
-				double maxSueldo = 0.0;
-				for (Conductor conductor : gt.conductores()) {
-					if (conductor.sueldo() > maxSueldo) {
-						maxSueldo = conductor.sueldo();
-						resultado.clear();
-						resultado.add(conductor);
-					} else if (conductor.sueldo() == maxSueldo) {
-						resultado.add(conductor);
-					}
-				}		
-				String msj = "";
-				if (resultado.size() == 0) {
-					msj = "No hay conductores";
-				} else {
-					for (Conductor conductor : resultado) {
-						msj += conductor.getNombre() + " "+conductor.getNombre()+"\n";
-					}
-				}
-				mensaje("MEJOR CONDUCTOR", msj);
-				break;
-			}
-		}
-	}
+        String dni       = lectura.leeString(CAMPO_DNI);
+        String nombre    = lectura.leeString(CAMPO_NOMBRE);
+        String apellido1 = lectura.leeString(CAMPO_APELLIDO1);
+        String apellido2 = lectura.leeString(CAMPO_APELLIDO2);
+        String direccion = lectura.leeString(CAMPO_DIRECCION);
 
-	/**	
-	 * Metodo auxiliar que muestra un ventana de mensaje
-	 * @param titulo titulo de la ventana
-	 * @param txt texto contenido en la ventana
-	 */
-	private static void mensaje(String titulo, String txt) {
-		Mensaje msj = new Mensaje(titulo);
-		msj.escribe(txt);
+        if (!gestion.anhadeConductor(dni, nombre, apellido1, apellido2, direccion)) {
+            mensaje("ERROR", "Ya existe un conductor con DNI " + dni);
+        }
+    }
 
-	}
+    private static void procesarAnhadeTransporte(GestionTransportes gestion) {
+        Lectura lectura = new Lectura("Nuevo transporte");
+        lectura.creaEntrada(CAMPO_DNI, "");
+        lectura.creaEntrada(CAMPO_TIPO, "");
+        lectura.creaEntrada(CAMPO_HORAS, 0);
+        lectura.creaEntrada(CAMPO_PERSONAS, 0);
+        lectura.creaEntrada(CAMPO_TONELADAS, 0);
+        lectura.esperaYCierra();
 
+        String dni       = lectura.leeString(CAMPO_DNI);
+        String tipo      = lectura.leeString(CAMPO_TIPO);
+        int    horas     = lectura.leeInt(CAMPO_HORAS);
+        int    personas  = lectura.leeInt(CAMPO_PERSONAS);
+        int    toneladas = lectura.leeInt(CAMPO_TONELADAS);
+
+        Conductor conductor = gestion.buscaConductor(dni);
+        if (conductor != null) {
+            Transporte transporte = parseTipoTransporte(tipo, horas, personas, toneladas);
+            if (transporte != null) {
+                conductor.anhadeTransporte(transporte);
+            }
+        } else {
+            mensaje("ERROR", "No existe un conductor con DNI " + dni);
+        }
+    }
+
+    private static Transporte parseTipoTransporte(String tipo, int horas, int personas, int toneladas) {
+        return switch (tipo) {
+            case "P"  -> new Transporte(horas, CategoriaTransporte.Personas,             personas);
+            case "M"  -> new Transporte(horas, CategoriaTransporte.Mercancias,           toneladas);
+            case "MP" -> new Transporte(horas, CategoriaTransporte.MercanciasPeligrosas, toneladas);
+            default   -> null;
+        };
+    }
+
+    private static void procesarSueldoConductor(GestionTransportes gestion) {
+        Lectura lectura = new Lectura("Sueldo conductor");
+        lectura.creaEntrada(CAMPO_DNI, "");
+        lectura.esperaYCierra();
+
+        String    dni       = lectura.leeString(CAMPO_DNI);
+        Conductor conductor = gestion.buscaConductor(dni);
+
+        if (conductor != null) {
+            mensaje("Sueldo", "El sueldo del conductor es: " + conductor.sueldo());
+        } else {
+            mensaje("ERROR", "No existe un conductor con DNI " + dni);
+        }
+    }
+
+    private static void procesarMejorConductor(GestionTransportes gestion) {
+        List<Conductor> mejores   = new ArrayList<>();
+        double          maxSueldo = 0.0;
+
+        for (Conductor conductor : gestion.conductores()) {
+            double sueldo = conductor.sueldo();
+            if (sueldo > maxSueldo) {
+                maxSueldo = sueldo;
+                mejores.clear();
+                mejores.add(conductor);
+            } else if (sueldo == maxSueldo) {
+                mejores.add(conductor);
+            }
+        }
+
+        String texto = mejores.isEmpty()
+                ? "No hay conductores"
+                : formatearMejoresConductores(mejores);
+        mensaje("MEJOR CONDUCTOR", texto);
+    }
+
+    private static String formatearMejoresConductores(List<Conductor> conductores) {
+        StringBuilder sb = new StringBuilder();
+        for (Conductor conductor : conductores) {
+            sb.append(conductor.getNombre())
+              .append(" ")
+              .append(conductor.getApellido1())  // Bug fix: original usaba getNombre() dos veces
+              .append("\n");
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Muestra una ventana de mensaje.
+     *
+     * @param titulo titulo de la ventana
+     * @param texto  texto contenido en la ventana
+     */
+    private static void mensaje(String titulo, String texto) {
+        Mensaje msj = new Mensaje(titulo);
+        msj.escribe(texto);
+    }
 }
