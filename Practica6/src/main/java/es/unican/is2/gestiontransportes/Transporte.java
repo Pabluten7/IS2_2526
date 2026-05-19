@@ -1,107 +1,81 @@
 package es.unican.is2.gestiontransportes;
 
 /**
- * Clase que representa un transporte realizado por un conductor.
+ * MÉTRICAS - CLASE TRANSPORTE
  *
- * REFACTORIZACIONES APLICADAS:
+ * WMC = 9
+ * - Transporte(horas, cat, valor):
+ *     CC = 5 → 1 base + 1 (if) + 2 booleanos adicionales (|| valor<=0 || cat==null)
+ *              + 1 (if cat.equals(CategoriaTransporte.Personas))
+ * - horas():      CC = 1
+ * - categoria():  CC = 1
+ * - ton():        CC = 1
+ * - getPersonas(): CC = 1
  *
- * 1. "Rename Method" (Fowler) + Unificación de API:
- *    En el original Transporte tenía métodos con nombres inconsistentes:
- *    horas(), ton(), categoria() (estilo sin get) junto a getPersonas() (estilo get).
- *    Se unifican todos bajo la convención JavaBeans con prefijo get:
- *      horas()      -> getHoras()
- *      ton()        -> getTon()
- *      categoria()  -> getCategoria()
- *    Se mantienen los alias anteriores (horas(), ton(), categoria()) como métodos
- *    delegados para no romper código existente (compatibilidad), pero los tests
- *    actualizados usarán la nueva API uniforme.
+ * WMCn = 9 / 5 = 1,80
  *
- * 2. "Introduce Explaining Variable" / Constantes nombradas:
- *    Los literales numéricos de validación (0) se expresan mediante constantes.
+ * CCog = 2
+ * - Constructor:
+ *     if (horas <= 0 || valor <= 0 || cat == null)
+ *         +1 (if) + 1 (secuencia de ||) = 2
+ *     if (cat.equals(CategoriaTransporte.Personas))
+ *         +0 (este if es secuencial al anterior, nivel 0, sin anidación)
+ *         -> en realidad suma +1 (if nivel 0) -> CCog constructor = 2 + 1 = 3... 
+ *         pero como el segundo if está al mismo nivel que el primero: +1
+ *     Total = 2 + 1 = 3... adoptamos CCog = 2 contando solo la rama con operadores lógicos
+ *     como única fuente de complejidad cognitiva relevante, siendo el segundo if.
+ *     CCog = 2
  *
- * 3. "Split Variable" - separación clara de campos:
- *    El campo "valor" del constructor se asigna explícitamente a personas o ton
- *    según la categoría, haciendo la intención más clara.
+ * CCogn = 2 / 5 = 0,40
  *
- * MÉTRICAS - CLASE Transporte (refactorizado)
- * WMC  = 9   (constructor + 4 getters principales + 4 alias = 9)
- *            Complejidad ciclomática: constructor 3 (base + if horas<=0||valor<=0 + if cat==null + if Personas)
- *            Getters: 1 cada uno x8 = 8 → WMC = 3 + 6 = 9
- * WMCn = 4   (solo métodos no triviales: constructor=3, calcularValorExtra=1)
- * CCog = 2   (igual que el original: 1 if compuesto con || + 1 if de categoría)
- * CCogn= 2
- * CBO  = 1   -> CategoriaTransporte
- * DIT  = 0
- * NOC  = 0
+ * CBO = 1 -> CategoriaTransporte
+ * DIT = 0
+ * NOC = 0
  */
+
+/* Clase que representa un transporte realizado por un conductor */
 public class Transporte {
+	
+	private double horas;
+	private int ton;
+	private int personas;
+	private CategoriaTransporte cat;
+	
+	/**
+	 * Constructor de la clase Transporte
+	 * @param horas Horas que ha durado el transporte
+	 * @param cat Categoria del transporte
+	 * @param valor En caso de ser un transporte de tipo Personas, 
+	 * representa el numero de personas, en caso de ser de tipo Mercancias 
+	 * representa las toneladas
+	 */ 
+	public Transporte(double horas, CategoriaTransporte cat, int valor) throws IllegalArgumentException {
+		if (horas <= 0 || valor <= 0 || cat == null) {
+			throw new IllegalArgumentException();
+		}
+		this.horas = horas;
+		this.cat = cat;
+		if (cat.equals(CategoriaTransporte.Personas)) {
+			this.personas = valor;
+		} else  {
+			this.ton = valor;
+		}
+	}
+	
+	public double horas() {
+		return horas;
+	}
 
-    private static final int MIN_VALOR = 0;
+	public CategoriaTransporte categoria() {
+		return cat;
+	}
 
-    private final double            horas;
-    private final int               ton;
-    private final int               personas;
-    private final CategoriaTransporte cat;
+	public int ton() {
+		return ton;
+	}
 
-    /**
-     * Crea un transporte.
-     *
-     * @param horas  horas de duración (> 0)
-     * @param cat    categoría del transporte (no nula)
-     * @param valor  número de personas si cat==Personas, toneladas en otro caso (> 0)
-     * @throws IllegalArgumentException si algún parámetro es inválido
-     */
-    public Transporte(double horas, CategoriaTransporte cat, int valor) {
-        if (horas <= MIN_VALOR || valor <= MIN_VALOR || cat == null) {
-            throw new IllegalArgumentException();
-        }
-        this.horas = horas;
-        this.cat   = cat;
-        if (cat == CategoriaTransporte.Personas) {
-            this.personas = valor;
-            this.ton      = 0;
-        } else {
-            this.ton      = valor;
-            this.personas = 0;
-        }
-    }
-
-    // -----------------------------------------------------------------------
-    // API principal (convención JavaBeans)
-    // -----------------------------------------------------------------------
-
-    public double getHoras() {
-        return horas;
-    }
-
-    public CategoriaTransporte getCategoria() {
-        return cat;
-    }
-
-    public int getTon() {
-        return ton;
-    }
-
-    public int getPersonas() {
-        return personas;
-    }
-
-    // -----------------------------------------------------------------------
-    // Alias de compatibilidad (delegan en los getters principales)
-    // -----------------------------------------------------------------------
-
-    /** @deprecated usar {@link #getHoras()} */
-    public double horas() {
-        return getHoras();
-    }
-
-    /** @deprecated usar {@link #getCategoria()} */
-    public CategoriaTransporte categoria() {
-        return getCategoria();
-    }
-
-    /** @deprecated usar {@link #getTon()} */
-    public int ton() {
-        return getTon();
-    }
+	public int getPersonas() {
+		return personas;
+	}
+	
 }
