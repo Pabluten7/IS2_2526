@@ -1,5 +1,17 @@
 package es.unican.is2.gestiontransportes;
 
+/**
+ * MÉTRICAS - CLASE TRANSPORTE
+ * WMC = 9
+ * - Métodos simples: 4 getters = 4
+ * - Constructor: 5 (1 base + 2 condiciones del if + 2 booleanos adicionales por ||)
+ * CCog = 2
+ * - Constructor: 2 (1 por if + 1 por secuencia de ||)
+ * CBO = 1 -> CategoriaTransporte
+ * DIT = 0
+ * NOC = 0
+ */
+
 /* Clase que representa un transporte realizado por un conductor */
 public class Transporte {
 	

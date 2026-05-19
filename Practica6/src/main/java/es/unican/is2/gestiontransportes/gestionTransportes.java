@@ -2,6 +2,20 @@ package es.unican.is2.gestiontransportes;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * MÉTRICAS - CLASE GESTIONTRANSPORTES
+ * WMC = 6
+ * - conductores(): 1
+ * - buscaConductor(): 3 (1 base + 1 por for + 1 por if)
+ * - anhadeConductor(): 2 (1 base + 1 por if)
+ * CCog = 3
+ * - buscaConductor(): 2 (1 por for + 1 por if anidado en for)
+ * - anhadeConductor(): 1 (1 por if)
+ * CBO = 1 -> Conductor
+ * DIT = 0
+ * NOC = 0
+ */
+
 public class GestionTransportes {
 
 	private ArrayList<Conductor> cs = new ArrayList<Conductor>();

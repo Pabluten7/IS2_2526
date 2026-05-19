@@ -4,6 +4,22 @@ import java.util.List;
 import fundamentos.*;
 
 /**
+ * MÉTRICAS - CLASE GESTIONTRANSPORTESGUI
+ * WMC = 16
+ * - mensaje(): 1
+ * - main(): 15 (1 base + 1 while + 4 cases switch externo + 1 if ANHADE_CONDUCTOR
+ *               + 1 if ANHADE_TRANSPORTE + 3 cases switch tipo + 1 if SUELDO
+ *               + 1 for + 1 if + 1 else if MEJOR_CONDUCTOR)
+ * CCog = 24
+ * - main(): 24 (1 while + 2 switch anidado + 3 if nivel 2 + 4 switch anidado nivel 3
+ *               + 1 else + 3 if nivel 2 + 1 else + 3 for nivel 2 + 4 if nivel 3
+ *               + 2 else if + 3 if nivel 2)
+ * CBO = 4 -> GestionTransportes, Conductor, Transporte, CategoriaTransporte
+ * DIT = 0
+ * NOC = 0
+ */
+
+/**
  * Gestion de una empresa de transportes
  */
 public class GestionTransportesGUI {
