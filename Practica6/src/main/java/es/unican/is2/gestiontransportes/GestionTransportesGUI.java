@@ -5,37 +5,35 @@ import java.util.List;
 import fundamentos.*;
 
 /**
- * Interfaz gráfica de la gestión de una empresa de transportes.
- *
+ * 
+
  * REFACTORIZACIONES APLICADAS:
  *
- * 1. "Extract Method" (Fowler):
+ * 1. Uso Fowler
  *    Cada case del switch principal se extrae a un método privado dedicado:
  *      - procesarAnhadeConductor()
  *      - procesarAnhadeTransporte()
  *      - procesarSueldoConductor()
  *      - procesarMejorConductor()
- *    Esto reduce drásticamente el CCog de main(), que pasa de 24 a 5.
+ *    Esto reduce  el CCog de main(), que pasa de 24 a 5.
  *
- * 2. "Replace Conditional with Polymorphism" en parseTipoTransporte():
- *    El switch anidado sobre el tipo de transporte ("P","M","MP") se extrae
+ * 2. cambio el condicional porpolimorfismo en parseTipoTransporte():
+ *    El switch anidado sobre el tipo de transporte lo muevo
  *    a un método privado auxiliar con un valor de retorno claro.
  *
- * 3. "Introduce Constant" (Fowler):
- *    Las cadenas "DNI", "Nombre", etc. se declaran como constantes para
- *    evitar magic strings duplicadas en varios métodos.
+ * 3. "Mediante Fowler, extraigo constantes para evitar strings problemáticos
+ *    Las cadenas "DNI", "Nombre", etc. se declaran como constanteses
  *
- * 4. Bug fix detectado durante refactorización (MEJOR_CONDUCTOR):
- *    El original mostraba conductor.getNombre() dos veces en lugar de
- *    getNombre() + getApellido1(). Se corrige.
+ * 4. El original mostraba conductor.getNombre() dos veces en lugar de
+ *    getNombre() + getApellido1(). lo corrijo.
  *
- * 5. "Rename Variable":
+ * 5. Cambio nombres de variables para que sean descriptivas:
  *    Variables de un solo carácter o abreviadas (gt, lect, c, t, msj)
  *    pasan a tener nombres descriptivos.
  *
  * MÉTRICAS - CLASE GestionTransportesGUI (refactorizado)
  * WMC  = 22
- *   - main():                        2  (base + while)
+ *   - main():                         2  (base + while)
  *   - procesarAnhadeConductor():      2  (base + if)
  *   - procesarAnhadeTransporte():     3  (base + if + switch tipo)
  *   - parseTipoTransporte():          4  (base + 3 cases)

@@ -1,12 +1,11 @@
 package es.unican.is2.gestiontransportes;
 
 /**
- * Enumerado que representa las categorías posibles de un transporte.
- *
+
  * REFACTORIZACIÓN APLICADA:
- * - "Replace Conditional with Polymorphism" (Fowler):
+ *   Uso Fowler para remplazar el condicional por un polimorfismo
  *   El switch sobre la categoría del transporte que existía en Conductor.sueldo()
- *   se elimina trasladando la lógica de cálculo de sueldo extra a cada valor
+ *   elimino trasladando la lógica de cálculo de sueldo extra a cada valor
  *   del enum. Cada categoría sabe cómo calcular su propio sueldo extra,
  *   eliminando el acoplamiento en Conductor y reduciendo su CCog.
  *
